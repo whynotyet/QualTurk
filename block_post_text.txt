@@ -1,0 +1,20 @@
+Final instructions
+
+You have almost completed the research survey and we appreciate your time and effort. However, we have to make sure that our data are valid and not biased. Specifically, we are interested in whether you actually take the time to read instructions closely; if not, our data based on your responses will be invalid. In order to demonstrate that you have read instructions, please select the option "No answer" for the next question that asks about the length of the study and type “I read the instructions” in the box labeled "Any other comments or questions?" Thank you very much.
+
+---------
+
+How long did you feel this survey was?
+<Very long
+Long
+Somewhat long
+Neither long nor short
+Somewhat short
+Short
+Very short
+No answer>
+
+---------
+
+Any other comments or questions?
+<text input box>
