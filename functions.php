@@ -54,15 +54,18 @@ function survey_table($user_id){
 	connectDB();
 	$result = mysql_query("SELECT * FROM surveys WHERE created_by=".$user_id);
 	if(mysql_num_rows($result)>0){
-		echo "<table><tr class=\"head_row\"><td>Survey Name</td><td>Survey ID</td><td>Hits (done)</td><td>Minimum (avg.)</td><td>(1)</td><td>(2)</td><td>(3)</td><td></td></tr>";
+		echo "<table><tr class=\"head_row\"><td>Survey Name</td><td>Survey ID</td><td>Hits (done)</td><td>Avg. time (min.)</td><td>(1)</td><td>(2)</td><td>(3)</td><td></td></tr>";
 		while($row=mysql_fetch_assoc($result)){
 			echo "<tr><td>".$row['survey_name']."</td>";
 			echo '<td><a title="Link to Qualtrics Survey" href="'.$row['survey_link'].'" target="_blank">'.$row['survey_id']."</td>";
-			$stat=mysql_fetch_assoc(mysql_query("SELECT COUNT(status) as total,SUM(status='done') as done,avg(timestampdiff(MINUTE,time_created,date_returned)) as average FROM `hits` WHERE survey_id='".$row['survey_id']."'"));
+			$stat=mysql_fetch_assoc(mysql_query("SELECT COUNT(status) as total, SUM(status='done') as done, 
+				avg(timestampdiff(MINUTE,time_created,date_returned)) as average 
+				FROM `hits` 
+				WHERE survey_id='".$row['survey_id']."'"));
 			$stat['done']=(!is_numeric($stat['done']))?0:$stat['done'];
 			$stat['average']=(!is_numeric($stat['average']))?'n/a':round($stat['average'],1);
 			echo "<td>".$stat['total']." (".$stat['done'].")</td>";
-			echo "<td>".(($row['min_time']==0)?'off (':($row['min_time']." min (")).$stat['average'].")</td>";
+			echo "<td>".$stat['average']." min (".(($row['min_time']==0)?'off':($row['min_time'])).")</td>";
 			echo "<td><a class=\"open_html\" id=\"".$row['survey_id']."\" title=\"HTML for MTurk\">HTML</a></td>";
 			echo "<td><a class=\"open_link\" id=\"".$row['survey_id']."\" title=\"Link for 'Redirect to a URL' in Qualtrics Survey Options\">LINK</a></td>";
 			echo "<td><a href=\"output.php?survey_id=".$row['survey_id']."\" title=\"QualTurk records\" target=\"_blank\" onclick=\"var w=window.open(this.href,this.target,'width=1170,height=450,scrollbars=1'); return w?false:true\">CSV</a></td>";

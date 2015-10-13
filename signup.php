@@ -102,40 +102,40 @@ if(isset($_GET['k']) and !empty($_GET['k'])){
 	</script>
 </head>
 <body>
-
-<div id="login_form" class="no_bar">
-		<h3>Sign Up</h3>
-		<? if($add==1){ ?>
-			<div class="success">Check your email and follow the link</div>
-		<? }elseif($add==2){ ?>
-			<div class="error">Error - try again</div>
-		<? }elseif($add==3){ ?>
-			<div class="error">Username already taken</div>
-		<? }elseif($add==4){ ?>
-			<div class="error">Passwords do not match</div>
-		<? }elseif($add==5){ ?>
-			<div class="error">Password too short (min. 6 char)</div>
-		<? }elseif($add==6){ ?>
-			<div class="error">Invalid email format</div>
-		<? }elseif($add==7){ ?>
-			<div class="error">Username needs to be alphanumeric</div>	
-		<? }elseif($add==8){ ?>
-			<div class="error">All non-optional fields are required</div>			
-		<? }elseif($add==9){ ?>
-			<div class="error">Invalid activation link</div>			
-		<? } ?>
-		<form action="" method="post">
-			<label for="firstname"> first name</label><input type="text" name="firstname" value="<?=(isset($_POST['firstname']))?$_POST['firstname']:" first name"?>" /><br />
-			<label for="lastname"> last name</label><input type="text" name="lastname" value="<?=(isset($_POST['lastname']))?$_POST['lastname']:" last name"?>" /><br />
-			<label for="institution"> institution (optional)</label><input type="text" name="institution" value="<?=(isset($_POST['institution']))?$_POST['institution']:" institution (optional)"?>" /><br />
-			<label for="email"> email</label><input type="text" name="email" value="<?=(isset($_POST['email']))?$_POST['email']:" email"?>" /><br />
-			<label for="username"> username</label><input type="text" name="username" value="<?=(isset($_POST['username']))?$_POST['username']:" username"?>" /><br />
-			<label for="pwd1"> password (min. 6 characters)</label><input class="spe" type="text" name="pwd0t" value=" new password (min. 6 characters)" /><input class="h spe" type="password" name="pwd1" value="" /><br />
-			<label for="pwd2"> confirm password</label><input class="spe" type="text" name="pwd0t" value=" confirm new password" /><input class="h spe" type="password" name="pwd2" value="" /><br />
-			<input type="submit" name="add" class="subm" value="Create Account" />
-		</form>
+<div id="wrapper">
+	<div id="login_form" class="no_bar">
+			<h3>Create QualTurk Account</h3>
+			<? if($add==1){ ?>
+				<div class="success">Check your email and follow the link</div>
+			<? }elseif($add==2){ ?>
+				<div class="error">Error - try again</div>
+			<? }elseif($add==3){ ?>
+				<div class="error">Username already taken</div>
+			<? }elseif($add==4){ ?>
+				<div class="error">Passwords do not match</div>
+			<? }elseif($add==5){ ?>
+				<div class="error">Password too short (min. 6 char)</div>
+			<? }elseif($add==6){ ?>
+				<div class="error">Invalid email format</div>
+			<? }elseif($add==7){ ?>
+				<div class="error">Username needs to be alphanumeric</div>	
+			<? }elseif($add==8){ ?>
+				<div class="error">All non-optional fields are required</div>			
+			<? }elseif($add==9){ ?>
+				<div class="error">Invalid activation link</div>			
+			<? } ?>
+			<form action="" method="post">
+				<label for="firstname"> first name</label><input type="text" name="firstname" value="<?=(isset($_POST['firstname']))?$_POST['firstname']:" first name"?>" /><br />
+				<label for="lastname"> last name</label><input type="text" name="lastname" value="<?=(isset($_POST['lastname']))?$_POST['lastname']:" last name"?>" /><br />
+				<label for="institution"> institution (optional)</label><input type="text" name="institution" value="<?=(isset($_POST['institution']))?$_POST['institution']:" institution (optional)"?>" /><br />
+				<label for="email"> email</label><input type="text" name="email" value="<?=(isset($_POST['email']))?$_POST['email']:" email"?>" /><br />
+				<label for="username"> username</label><input type="text" name="username" value="<?=(isset($_POST['username']))?$_POST['username']:" username"?>" /><br />
+				<label for="pwd1"> password (min. 6 characters)</label><input class="spe" type="text" name="pwd0t" value=" new password (min. 6 characters)" /><input class="h spe" type="password" name="pwd1" value="" /><br />
+				<label for="pwd2"> confirm password</label><input class="spe" type="text" name="pwd0t" value=" confirm new password" /><input class="h spe" type="password" name="pwd2" value="" /><br />
+				<input type="submit" name="add" class="subm" value="Create Account" />
+			</form>
+	</div>
 </div>
-
 </body>
 </html>
 

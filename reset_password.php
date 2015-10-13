@@ -51,24 +51,24 @@ if(isset($_POST['reset']) and !empty($_POST['reset'])){
 	</script>
 </head>
 <body>
-
-<div id="login_form">
-	<h3>Reset Password</h3>
-	<? if($reset==1){ ?>
-		<div class="success">Password reset successfully</div>
-	<? }elseif($reset==2){ ?>
-		<div class="error">Incorrect current password</div>
-	<? }elseif($reset==3){ ?>
-		<div class="error">New passwords don't match</div>
-	<? } ?>
-	<form action="" method="post">
-		<label for="pwd1"> current password</label><input type="text" name="pwd0t" value=" current password" /><input class="h" type="password" name="pwd0" value="" /><br />
-		<label for="pwd1"> new password</label><input type="text" name="pwd0t" value=" new password" /><input class="h" type="password" name="pwd1" value="" /><br />
-		<label for="pwd2"> confirm new password</label><input type="text" name="pwd0t" value=" confirm new password" /><input class="h" type="password" name="pwd2" value="" /><br />
-		<input type="submit" name="reset" class="subm" value="Reset" />
-	</form>
+<div id="wrapper">
+	<div id="login_form">
+		<h3>Reset Your QualTurk Password</h3>
+		<? if($reset==1){ ?>
+			<div class="success">Password reset successfully</div>
+		<? }elseif($reset==2){ ?>
+			<div class="error">Incorrect current password</div>
+		<? }elseif($reset==3){ ?>
+			<div class="error">New passwords don't match</div>
+		<? } ?>
+		<form action="" method="post">
+			<label for="pwd1"> current password</label><input type="text" name="pwd0t" value=" current password" /><input class="h" type="password" name="pwd0" value="" /><br />
+			<label for="pwd1"> new password</label><input type="text" name="pwd0t" value=" new password" /><input class="h" type="password" name="pwd1" value="" /><br />
+			<label for="pwd2"> confirm new password</label><input type="text" name="pwd0t" value=" confirm new password" /><input class="h" type="password" name="pwd2" value="" /><br />
+			<input type="submit" name="reset" class="subm" value="Reset" />
+		</form>
+	</div>
 </div>
-
 </body>
 </html>
 

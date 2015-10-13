@@ -7,59 +7,102 @@ if($_GET["l"]!="c"){
 include 'functions.php';
 
 connectDB();
-$error=false;
-$completionCode=false;
-$timestamp=date('Y-m-d H:i:s');
+$error = false;
+$completionCode = false;
+$timestamp = date('Y-m-d H:i:s');
 
-if(isset($_GET['workerid']) and !empty($_GET['workerid']) and isset($_GET['surveyid']) and !empty($_GET['surveyid'])){
+if (isset($_GET['workerid']) and !empty($_GET['workerid']) and 
+	isset($_GET['surveyid']) and !empty($_GET['surveyid'])) {
 	$WID = mysql_real_escape_string($_GET['workerid']);
 	$SID = mysql_real_escape_string($_GET['surveyid']);
 	$GUID = getGUID();
-	$result=mysql_query("SELECT worker_id FROM `hits` WHERE survey_id='$SID' and worker_id='$WID'");
-	if(mysql_num_rows($result)==0){ //woker id not in DB
+	$result = mysql_query("SELECT worker_id FROM `hits` WHERE survey_id='$SID' and worker_id='$WID'");
+
+	if (mysql_num_rows($result) == 0) { //if woker id not in DB, create entry
 		
-		$query="INSERT INTO `hits` (survey_id,time_created,guid,worker_id,`status`) VALUES('$SID','$timestamp','$GUID','$WID','in_progress')";
+		$query = "INSERT INTO `hits` (survey_id, time_created, guid, worker_id, `status`) 
+		          VALUES('$SID','$timestamp','$GUID','$WID','in_progress')";
+
 		$result = mysql_query($query);
-		if(!$result){
+
+		if (!$result) {
 			die('Can\'t insert data :' . mysql_error());
 		}
+
+		// send to survey
 		header('Location: https://stanforduniversity.qualtrics.com/SE/?SID='.$SID.'&workerid='.$WID);
 
-	}else{ //worker id IS in DB
-		$error="duplicate";
+	} else { //if worker id is already in DB; throw duplicate error
+		$error = "duplicate";
 	}
 	
-}elseif(isset($_GET['partid']) and !empty($_GET['partid']) and isset($_GET['surveyid']) and !empty($_GET['surveyid'])){
+} elseif (isset($_GET['partid']) and !empty($_GET['partid']) and 
+		isset($_GET['surveyid']) and !empty($_GET['surveyid'])) {
 	$WID = mysql_real_escape_string($_GET['partid']);
 	$SID = mysql_real_escape_string($_GET['surveyid']);
-	$time=mysql_fetch_assoc(mysql_query("SELECT TIMESTAMPDIFF(MINUTE,time_created,'$timestamp') as `duration`, (select `min_time` FROM `surveys` WHERE survey_id='$SID') as `minT` FROM `hits` WHERE survey_id='$SID' and worker_id='$WID'"));
+	
+	# Responses to final check questions
 	$long = $_GET['long'];
 	$comm = $_GET['comm'];
+
+	# Get time spent and minimum required time
+	$time = mysql_fetch_assoc(mysql_query(
+		"SELECT TIMESTAMPDIFF(MINUTE, time_created, '$timestamp') AS `duration`, 
+		(SELECT `min_time` FROM `surveys` WHERE survey_id='$SID') AS `minT` 
+		FROM `hits` WHERE survey_id='$SID' AND worker_id='$WID'"
+	));
 	
-	$reload_q=mysql_query("SELECT `status` FROM `hits` WHERE survey_id='$SID' and worker_id='$WID'");
-	$reload=mysql_fetch_assoc($reload_q);
-	if($reload['status']=='pre_problem' or $reload['status']=='end_problem' or $reload['status']=='time_problem'){ 
-		$error=$reload['status'];//if someone tries to reload the page to be clever, he gets the same message
-	}elseif($long=='' and $comm=='' and $reload['status']!='done'){
-		mysql_query("UPDATE `hits` SET `status`='pre_problem',date_returned='$timestamp' WHERE survey_id='$SID' and worker_id='$WID'");
-		$error="pre_problem";
-	}elseif(($long!="No answer" or levenshtein("I read the instructions",$comm)>6)  and $reload['status']!='done'){
-		mysql_query("UPDATE `hits` SET `status`='end_problem',date_returned='$timestamp' WHERE survey_id='$SID' and worker_id='$WID'");
-		$error="end_problem";
-	}elseif( $time['minT']>0 and $time['duration']<$time['minT'] and $reload['status']!='done'){
-		mysql_query("UPDATE `hits` SET `status`='time_problem',date_returned='$timestamp' WHERE survey_id='$SID' and worker_id='$WID'");
-		$error="time_problem";
-	}else{
-		$result=mysql_query("SELECT guid FROM `hits` WHERE survey_id='$SID' and worker_id='$WID'");
-		if(mysql_num_rows($result)==1){ //woker id not in DB
-			$row=mysql_fetch_assoc($result);
+	# Load definitive status
+	$reload = mysql_fetch_assoc(mysql_query(
+		"SELECT `status` FROM `hits` WHERE survey_id='$SID' AND worker_id='$WID'"
+	));
+
+	if ($reload['status'] == 'pre_problem' or 
+		$reload['status'] == 'end_problem' or 
+		$reload['status'] == 'time_problem') { 
+		//if someone tries to reload the page to be clever, he gets the same message
+		$error = $reload['status'];
+	
+	} elseif ($long == '' and $comm == '' and $reload['status'] != 'done') {
+		$completionCode = "PRE0" . substr(getGUID(), 0, 6);
+		$error = "pre_problem";
+		mysql_query("UPDATE `hits` SET `status` = '$error', date_returned = '$timestamp', 
+			guid = '$completionCode' WHERE survey_id = '$SID' and worker_id = '$WID'");
+
+	} elseif ((
+		strtolower($long) != "no answer" or 
+		levenshtein("i read the instructions", strtolower($comm)) > 6
+		) and $reload['status']!='done') {
+		$completionCode = "POST0" . substr(getGUID(), 0, 5);
+		$error = "end_problem";
+		mysql_query("UPDATE `hits` SET `status` = '$error', date_returned = '$timestamp', 
+			guid = '$completionCode' WHERE survey_id = '$SID' and worker_id = '$WID'");
+
+	} elseif ($time['minT'] > 0 and 
+		$time['duration'] < $time['minT'] and 
+		$reload['status'] != 'done') {
+		$completionCode = "POST0" . substr(getGUID(), 0, 5);
+		$error = "time_problem";
+		mysql_query("UPDATE `hits` SET `status` = '$error', date_returned = '$timestamp', 
+			guid = '$completionCode' WHERE survey_id = '$SID' and worker_id = '$WID'");
+
+	} else {
+		$result = mysql_query("SELECT guid FROM `hits` WHERE survey_id = '$SID' and worker_id = '$WID'");
+
+		if (mysql_num_rows($result) == 1) { //woker id not in DB
+			mysql_query("UPDATE `hits` SET `status` = 'done', date_returned = '$timestamp' 
+				WHERE survey_id='$SID' and worker_id='$WID'");
+
+			$row = mysql_fetch_assoc($result);
 			$completionCode = $row['guid'];
-			mysql_query("UPDATE `hits` SET `status`='done',date_returned='$timestamp' WHERE survey_id='$SID' and worker_id='$WID'");
-			$result=mysql_query("SELECT `debrief` FROM `surveys` WHERE survey_id='$SID'");
-			$row=mysql_fetch_assoc($result);
+
+			$row = mysql_fetch_assoc(mysql_query(
+				"SELECT `debrief` FROM `surveys` WHERE survey_id='$SID'"
+			));
 			$debrief = $row['debrief'];
-		}else{
-			$error="invalid";		
+
+		} else {
+			$error = "invalid";		
 		}
 	}
 }
@@ -91,40 +134,38 @@ if(isset($_GET['workerid']) and !empty($_GET['workerid']) and isset($_GET['surve
 	        <div id="page">
 	            <img alt="" src="header.gif" width="850" />
 				<div id="main-content">
-		        	<h1>Stanford Survey</h1>
+		        	<h1>End of Survey</h1>
 					<hr /><br /><br />	
-					<?
-					if($error){
-		            	echo '<h2 style="font-size: large">Not eligible</h2>';
-						if($error=="duplicate"){?>
-		        			<p>We are sorry, but you are not eligible to participate, because you have already started or completed this survey.</p>
-					<?	}elseif($error=="pre_problem"){?>
-			       			<p>We are sorry, but you are not eligible for this study.</p>
-							<p>You did not carefully read the questions during the pre-survey.</p>
-							<p>This has disqualified you from this study.</p>
-					<?	}elseif($error=="end_problem"){?>
-		        			<p>We are sorry, but you are not eligible for this study.</p>
-							<p>You did not carefully read the instructions during the survey. The final instructions directed you to do the following:</p>
-							<p><small>You have almost completed the research survey and we appreciate your time and effort. However, we have to make sure that our data are valid and not biased. Specifically, we are interested in whether you actually take the time to read instructions closely; if not, our data based on your responses will be invalid. In order to demonstrate that you have read instructions, please select the option "No answer" for the next question that asks about the length of the study and simply write "I read instructions" in the box labeled "Any other comments or questions?" Thank you very much.</small></p>
-							<p>These tasks were not done correctly. This has disqualified you from this study.</p>
-					<?	}elseif($error=="time_problem"){?>
-			       			<p>We are sorry, but you are not eligible for this study.</p>
-							<p> Timely completion of the task is essential for this study. You took less than the absolute minimum task completion time (set to <?=$time['minT']?> minutes).</p>
-							<p>This has disqualified you from this study.</p>
-					<?	}
-					}elseif($completionCode){ ?>			
-			            <h2 style="font-size: large">Almost done!</h2>
-			        	<p>You have answered all questions in the survey.<br /><br />To complete this HIT, please copy&amp;paste the <strong>completion code</strong> into the appropriate box on Mechanical Turk.</p>
-						<p>Completion code: <strong><?=$completionCode?></strong></p>
-						<br />
-						<? if(!empty($debrief)){ ?>
-							<br />
-							<h2 style="font-size: large">Study debrief</h2>
-							<p><small><?=nl2br($debrief)?></small></p>
-						<? }else{ ?>
-							<p>Thank you!</p>
+					<? if ($error == "duplicate") { ?>
+						<h2 style="font-size: large">There is a r</h2>
+		        		<p>You are unfortunately not eligible to participate, 
+		        			because you have already started or completed this survey.<br />
+		        			The instructions in the HIT clearly stated that 
+		        			each person can only complete the HIT once.</p>
+
+		        	<? } else { ?>
+
+					<h2 style="font-size: large">Almost done!</h2>
+					<p>To complete this HIT, you need to copy &amp; paste the 
+						<strong>completion code</strong> into the text box on Mechanical Turk.</p>
+
+						<? if ($completionCode) { ?>
+			       			<p>Completion code: <strong><?=$completionCode?></strong></p>
 						<? } ?>
+						
 						<br />
+						
+						<? if (!empty($debrief)) { ?>
+							<br />
+							<h2 style="font-size: large">Study Debriefing</h2>
+							<p><small>
+								<?=nl2br($debrief)?>
+							</small></p>
+							<br /><br />
+						<? } ?>
+
+						<p>Thank you!</p>
+
 					<? } ?>
 					<br /><br /><br /><br />
 				</div>

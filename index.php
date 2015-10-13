@@ -150,27 +150,37 @@ if(isset($_GET['del']) and !empty($_GET['del'])){
 <? if(!$in_session){ ?>
 <div id="top_bar">
 	<h1 onclick="location.href='http://www.qualturk.com/'">QualTurk</h1>
-	<span><a href="signup.php" target="_blank" onclick="var w=window.open(this.href,this.target,'width=650,height=550,scrollbars=0'); return w?false:true">sign up</a></span>
+	<span><a href="signup.php" target="_blank" onclick="var w=window.open(this.href,this.target,'width=650,height=550,scrollbars=0'); return w?false:true">Create Account</a></span>
 </div>
-<div id="quote"></div>
-<div id="login_form">
-	<h3>Researcher Login</h3>
-	<? if($logout==1){ ?>
-		<div class="success">You have successfully logged out.</div>
-	<? }elseif($logout==2){ ?>
-		<div class="error">Your session expired.</div>
-	<? }elseif($logout==3){ ?>
-		<div class="success">Password successfully reset.</div>
-	<? }elseif($logout==4){ ?>
-		<div class="success">Your account is now activated.</div>
-	<? }elseif($incorrect){ ?>
-		<div class="error">Incorrect login details. <a href="forgot_password.php" target="_blank" onclick="var w=window.open(this.href,this.target,'width=650,height=550,scrollbars=0'); return w?false:true">Forgot password?</a></div>
-	<? } ?>
-	<form action="/" method="post">
-		<label for="user"> user</label><input type="text" name="username" value=" user" /><br />
-		<label for="pwd"> password</label><input type="password" name="pwd" value=" password" /><br />
-		<input type="submit" name="login" class="subm" value="Login" />
-	</form>
+<div id="wrapper">
+	<div id="instructions">
+		<h2>About QualTurk</h2>
+		<p>QualTurk aims to increase the quality of survey data collected from Amazon Mechanical Turk (MTurk) by flagging respondents who fail quality checks. The system is designed to support Mechanical Turk in conjunction with Qualtrics.<br /><br />
+			<b>How it works</b> <br /><br />
+			MTurk workers are automatically registered by this system and forwarded to your Qualtrics survey. The quality checks include i. survey completion above a minimum time threshold (optional), ii. correctly answering an arbitrary set of pre-screening questions (optional), iii. correctly answering two specific questions that test if respondents read instructions (required). The system also ensures that workers cannot repeat the same HIT. The system provides workers with a completion code and optional debrief text. The code enables them to complete the HIT.<br /><br />
+			<b>What you get</b><br /><br />
+			 QualTurk provides data on which quality check each worker failed, if any (csv file). All workers receive a completion code (except repeat takers who are not eligible), which is also visible on MTurk. The code itself reflects if there was any quality issue and which one. Based on this information, you can decide who to pay on MTurk. Your Qualtrics survey will include responses from lower quality workers, but they can be filtered out by cross-checking with the QualTurk dataset on who passed which quality checks.
+			</p>
+	</div>
+	<div id="login_form">
+		<h3>Login</h3>
+		<? if($logout==1){ ?>
+			<div class="success">You have successfully logged out.</div>
+		<? }elseif($logout==2){ ?>
+			<div class="error">Your session expired.</div>
+		<? }elseif($logout==3){ ?>
+			<div class="success">Password successfully reset.</div>
+		<? }elseif($logout==4){ ?>
+			<div class="success">Your account is now activated.</div>
+		<? }elseif($incorrect){ ?>
+			<div class="error">Incorrect login details. <a href="forgot_password.php" target="_blank" onclick="var w=window.open(this.href,this.target,'width=650,height=550,scrollbars=0'); return w?false:true">Forgot password?</a></div>
+		<? } ?>
+		<form action="/" method="post">
+			<label for="user"> user</label><input type="text" name="username" value=" user" /><br />
+			<label for="pwd"> password</label><input type="password" name="pwd" value=" password" /><br />
+			<input type="submit" name="login" class="subm" value="Login" />
+		</form>
+	</div>
 </div>
 <!--
 <div id="footer">
@@ -182,26 +192,35 @@ if(isset($_GET['del']) and !empty($_GET['del'])){
 <? if($in_session){ ?>
 <div id="top_bar">
 	<h1 onclick="location.href='http://www.qualturk.com/'">QualTurk</h1>
-	<span>Hello, <?=$_SESSION['username']?>! <a href="reset_password.php" target="_blank" onclick="var w=window.open(this.href,this.target,'width=650,height=550,scrollbars=0'); return w?false:true">reset password</a> <a href="?logout=1">logout</a></span>
+	<span><?=ucfirst(strtolower($_SESSION['username']))?> <a href="reset_password.php" target="_blank" onclick="var w=window.open(this.href,this.target,'width=650,height=550,scrollbars=0'); return w?false:true">Settings</a> <a href="?logout=1">Logout</a></span>
 </div>
 <div id="wrapper">
 	<div id="instructions">
 		<h2>About QualTurk</h2>
-		<p>QualTurk helps reduce low-quality survey data by filtering participants based on pre- and post-screening questions. The system is designed to support Amazon's Mechanical Turk in conjunction with Qualtrics.<br /><br />
-			<em>How it works:</em> MTurk workers are automatically registered by this system and forwarded to your Qualtrics survey. If workers do not pass the screening questions or complete the HIT too quickly, they are redirected to this system and informed that they are now disqualified from taking this survey (if they fail the post-screening, they are told why). Otherwise, if they pass the screening questions and complete the survey, they are redirected to this system to receive a 'completion code' (and optional debrief text). This code enables them to complete the HIT.<br /><br />
-			<em>What you get:</em> All competed HITs on MTurk are from screened ('good') workers. Responses to your Qualtrics survey are a mixed bag of 'good' and 'bad' work. Process only survey responses from workers with a 'worker ID' 'completion code' combination matching those on your QualTurk account.	Reject workers who cannot provide the assigned 'completion code'.
+		<p>QualTurk aims to increase the quality of survey data collected from Amazon Mechanical Turk (MTurk) by flagging respondents who fail quality checks. The system is designed to support Mechanical Turk in conjunction with Qualtrics.<br /><br />
+			<b>How it works</b> <br /><br />
+			MTurk workers are automatically registered by this system and forwarded to your Qualtrics survey. The quality checks include i. survey completion above a minimum time threshold (optional), ii. correctly answering an arbitrary set of pre-screening questions (optional), iii. correctly answering two specific questions that test if respondents read instructions (required). The system also ensures that workers cannot repeat the same HIT. The system provides workers with a completion code and optional debrief text. The code enables them to complete the HIT.<br /><br />
+			<b>What you get</b><br /><br />
+			 QualTurk provides data on which quality check each worker failed, if any (csv file). All workers receive a completion code (except repeat takers who are not eligible), which is also visible on MTurk. The code itself reflects if there was any quality issue and which one. Based on this information, you can decide who to pay on MTurk. Your Qualtrics survey will include responses from lower quality workers, but they can be filtered out by cross-checking with the QualTurk dataset on who passed which quality checks.
 			</p>
 		<h2>Instructions</h2>
 		<ol id="steps">
 			<li><p>Add your (launched) Qualtrics survey to your QualTurk account using the form below.</p></li>
 			<li><p>In MTurk, copy/paste the survey-specific HTML code (1) into the 'Design Layout' box while in 'Edit HTML Source' mode. Switch back to normal viewing mode and change the study time and study description accordingly.</p></li>
 			<li><p>In Qualtrics, add your own pre-screening block with skip logic at the beginning of the study
-				 (<a href="block_pre.jpg" target="_blank" onclick="var w=window.open(this.href,this.target,'width=1170,height=600,scrollbars=1'); return w?false:true">example</a>).
-				Add this exact post-screening block at the end of the study (<a href="block_post.jpg" target="_blank" onclick="var w=window.open(this.href,this.target,'width=1170,height=600,scrollbars=1'); return w?false:true">picture</a>, <a href="block_post_text.txt" target="_blank" onclick="var w=window.open(this.href,this.target,'width=1000,height=350,scrollbars=1'); return w?false:true">text</a>) and enable Force Response on both.</p></li>
-			<li><p>In Qualtrics, open 'Survey Options', in 'Survey Termination' select 'Redirect to a URL' and copy/paste the link (2) that was generated for your survey. Replace xxx, yyy with the post-screening question IDs (xxx for 'How long...?') that can be retrieved using the 'Piped Text...' menu.</p></li>
+				 (optional, <a href="block_pre.jpg" target="_blank" onclick="var w=window.open(this.href,this.target,'width=1170,height=600,scrollbars=1'); return w?false:true">example</a>).
+				Add this <em>exact</em> post-screening block at the end of the study (<a href="block_post.jpg" target="_blank" onclick="var w=window.open(this.href,this.target,'width=1170,height=600,scrollbars=1'); return w?false:true">picture</a>, <a href="block_post_text.txt" target="_blank" onclick="var w=window.open(this.href,this.target,'width=1000,height=350,scrollbars=1'); return w?false:true">text</a>) and enable Force Response on both.</p></li>
+			<li><p>In Qualtrics, open 'Survey Options', in 'Survey Termination' select 'Redirect to a URL' and copy/paste the link (2) that was generated for your survey. Replace QIDxxx, QIDyyy with the post-screening question IDs (xxx for 'How long...?'; e.g., QID42) that can be retrieved using the 'Piped Text...' menu. (Important: Make sure to use the Piped Text menu, because internal Qualtics QIDs are different to those displayed next to the question.)</p></li>
 			<li><p>In Qualtrics, open 'Survey Flow', click 'Add Below' and select 'Embedded Data'. Type "workerid" in the yellow box and move the box to the top.</p></li>
-			<li><p>Release your HITs on MTurk and check the QualTurk records (3) to reject HITs that failed screening (status is not 'done').</p></li>
+			<li><p>Release your HITs on MTurk and check the QualTurk records (3). Reject HITs that failed screening based on the completion code (if needed) and filter out low-quality responses in Qualtrics.</p></li>
 		</ol>
+		<h2>Guide to Quality Checks</h2>
+		<p>If a worker passes all quality checks, their status in (3) will be 'done' and their completion code will be a long alphanumeric string.<br />
+		   If a worker fails the post-screening, their status in (3) will be 'end_problem' and their completion code will start with "POST".<br />
+		   If a worker fails the optional pre-screening, their status in (3) will be 'pre_problem' and their completion code will start with "PRE".<br />
+		   If a worker fails the optional time screening, their status in (3) will be 'time_problem' and their completion code will start with "TIME".<br />
+		   If a worker attempts to retake the HIT, their status in (3) will be 'duplicate' and they receive no completion code. In this case workers tend not to complete the HIT and are not listed on MTurk, but only QualTurk.
+		</p>
 	</div>
 	<div id="item_table">
 		<h2>Your Surveys</h2>
@@ -263,9 +282,9 @@ if(isset($_GET['del']) and !empty($_GET['del'])){
 		} 	 
 	</script>
 	</p> 
-	<div class="body"><img src="http://www.emief.com/oc/check.gif" alt="" style="float: right; padding:5px;" /> 
-		<h1><font color="#333399">Stanford Study: Announcement</font></h1>
-			We are researching ABCDEFGHIJKLMN. This HIT is part of a research project at Stanford.<br /> 
+	<div class="body"><img src="http://www.qualturk.com/check.png" alt="" style="float: right; padding:5px;" /> 
+		<h1><font color="#333399">Study Announcement</font></h1>
+			We are researching [THE TOPIC]. This HIT is part of a research project at [THE INSTITUTION].<br /> 
 		<h3>Confidentiality</h3> 
 			<p>No personally identifiable information will be stored after the study. You will remain completely anonymous.</p>
 			<h3>Requirements</h3>
@@ -279,7 +298,7 @@ if(isset($_GET['del']) and !empty($_GET['del'])){
 	<div class="body"><hr /> 
 		<h2>Task Confirmation</h2> 
 			<p>After completing the initial survey today you will receive a code to enter below:</p>
-			<p><input type="text" id="confirmationCode" size="50" name="Q2age" /></p>
+			<p><input type="text" id="confirmationCode" size="50" name="completioncode" /></p>
 			<p>Thank you very much for your participation!</p>
 	</div> <p>&nbsp;</p>
 </div>
